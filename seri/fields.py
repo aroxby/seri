@@ -90,7 +90,7 @@ class ReverseFixedString(FixedString):
 class DynamicList(BaseField):
     length = 0  # Length isn't known until other fields are deserialized
 
-    def __init__(self, element_field: 'BaseField', validator=None):
+    def __init__(self, element_field: BaseField, validator=None):
         super().__init__(validator)
         self.element_field = element_field
 
@@ -113,7 +113,7 @@ class DynamicList(BaseField):
 
 
 class EncodedLength(BaseField):
-    def __init__(self, length_field: 'BaseField', element_field: 'BaseField', validator=None):
+    def __init__(self, length_field: BaseField, element_field: BaseField, validator=None):
         super().__init__(validator)
         self.length_field = length_field
         self.element_field = element_field
