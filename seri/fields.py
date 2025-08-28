@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+# TODO: This should probably default to utf-8 but is set to cp437 to test with StarCraft 2 data
 STRING_CODEC = 'cp437'
 
 
