@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+# TODO: This should probably default to utf-8 but is set to cp437 to test with StarCraft 2 data
 STRING_CODEC = 'cp437'
 
 
@@ -27,7 +28,8 @@ class ByteArray(BaseField):
     def deserialize(self, data: bytes) -> (bytes, int):
         return data[:self.length], self.length
 
-    def serialize(self, obj) -> bytes:
+    def serialize(self, obj: bytes) -> bytes:
+        # TODO: Throw an error here if we don't have enough data (also in FixedString)
         return obj[:self.length]
 
 
@@ -90,7 +92,7 @@ class ReverseFixedString(FixedString):
 class DynamicList(BaseField):
     length = 0  # Length isn't known until other fields are deserialized
 
-    def __init__(self, element_field: Field, validator=None):
+    def __init__(self, element_field: BaseField, validator=None):
         super().__init__(validator)
         self.element_field = element_field
 
@@ -113,7 +115,7 @@ class DynamicList(BaseField):
 
 
 class EncodedLength(BaseField):
-    def __init__(self, length_field: Field, element_field: Field, validator=None):
+    def __init__(self, length_field: BaseField, element_field: BaseField, validator=None):
         super().__init__(validator)
         self.length_field = length_field
         self.element_field = element_field
