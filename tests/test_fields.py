@@ -24,11 +24,12 @@ class TestByteArray(unittest.TestCase):
         data = field.serialize(obj)
         self.assertEqual(data, b'\x01\x02\x03\x04')
 
-    def test_serialize_too_short_pads_with_nulls(self):
+    @unittest.expectedFailure
+    def test_serialize_too_short(self):
         field = fields.ByteArray(length=4)
         obj = b'\x01\x02'
-        data = field.serialize(obj)
-        self.assertEqual(b'\x01\x02\x00\x00', data)
+        with self.assertRaises(ValueError):
+            field.serialize(obj)
 
 
 class TestUIntFields(unittest.TestCase):

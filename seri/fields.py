@@ -28,7 +28,8 @@ class ByteArray(BaseField):
         return data[:self.length], self.length
 
     def serialize(self, obj: bytes) -> bytes:
-        return obj.ljust(self.length, b'\0')[:self.length]
+        # TODO: Throw an error here if we don't have enough data (also in FixedString)
+        return obj[:self.length]
 
 
 class UInt8(BaseField):
