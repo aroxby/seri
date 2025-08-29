@@ -20,12 +20,17 @@ class Serializer(metaclass=SerializerMeta):
         attrs = {}
         offset = 0
         for name, field in self.fields.items():
-            attrs[name], field_length = field.deserialize(data[offset:])
-            offset += field_length
+            if field.deserialize_predicate is None or field.deserialize_predicate(
+                self, name, field, attrs, data, offset
+            ):
+                attrs[name], field_length = field.deserialize(data[offset:])
+                field.validate(attrs[name])
+                offset += field_length
         return attrs, offset
 
     def serialize(self, attrs: dict) -> bytes:
         data = b''
         for name, field in self.fields.items():
-            data += field.serialize(attrs[name])
+            if field.serialize_predicate is None or field.serialize_predicate(self, name, field, attrs, data):
+                data += field.serialize(attrs[name])
         return data

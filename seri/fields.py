@@ -1,12 +1,24 @@
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 
 # TODO: This should probably default to utf-8 but is set to cp437 to test with StarCraft 2 data
 STRING_CODEC = 'cp437'
 
 
+DeserializePredicate = Callable[["Serializer", str, "BaseField", dict, bytes, int], bool]
+SerializePredicate = Callable[["Serializer", str, "BaseField", dict, bytes], bool]
+
+
 class BaseField(ABC):
-    def __init__(self, validator=None):
+    def __init__(
+        self,
+        validator=None,
+        deserialize_predicate: DeserializePredicate = None,
+        serialize_predicate: SerializePredicate = None,
+    ):
         self.validator = validator
+        self.deserialize_predicate = deserialize_predicate
+        self.serialize_predicate = serialize_predicate
 
     def validate(self, value):
         return self.validator(value) if self.validator else None
@@ -21,7 +33,13 @@ class BaseField(ABC):
 
 
 class ByteArray(BaseField):
-    def __init__(self, length: int, validator=None):
+    def __init__(
+        self,
+        length: int,
+        validator=None,
+        deserialize_predicate: DeserializePredicate = None,
+        serialize_predicate: SerializePredicate = None,
+    ):
         super().__init__(validator)
         self.length = length
 
@@ -74,7 +92,13 @@ class DynamicString(BaseField):
 
 
 class FixedString(DynamicString):
-    def __init__(self, length: int, validator=None):
+    def __init__(
+        self,
+        length: int,
+        validator=None,
+        deserialize_predicate: DeserializePredicate = None,
+        serialize_predicate: SerializePredicate = None,
+    ):
         super().__init__(validator)
         self.length = length
 
@@ -92,7 +116,13 @@ class ReverseFixedString(FixedString):
 class DynamicList(BaseField):
     length = 0  # Length isn't known until other fields are deserialized
 
-    def __init__(self, element_field: BaseField, validator=None):
+    def __init__(
+        self,
+        element_field: BaseField,
+        validator=None,
+        deserialize_predicate: DeserializePredicate = None,
+        serialize_predicate: SerializePredicate = None,
+    ):
         super().__init__(validator)
         self.element_field = element_field
 
@@ -108,14 +138,21 @@ class DynamicList(BaseField):
         return elements, offset
 
     def serialize(self, obj) -> bytes:
-        data = b''
+        data = b""
         for element in obj:
             data += self.element_field.serialize(element)
         return data
 
 
 class EncodedLength(BaseField):
-    def __init__(self, length_field: BaseField, element_field: BaseField, validator=None):
+    def __init__(
+        self,
+        length_field: BaseField,
+        element_field: BaseField,
+        validator=None,
+        deserialize_predicate: DeserializePredicate = None,
+        serialize_predicate: SerializePredicate = None,
+    ):
         super().__init__(validator)
         self.length_field = length_field
         self.element_field = element_field
@@ -133,7 +170,13 @@ class EncodedLength(BaseField):
 
 
 class NestedSerializer(BaseField):
-    def __init__(self, serializer: 'Serializer', validator=None):
+    def __init__(
+        self,
+        serializer: "Serializer",
+        validator=None,
+        deserialize_predicate: DeserializePredicate = None,
+        serialize_predicate: SerializePredicate = None,
+    ):
         super().__init__(validator)
         self.serializer = serializer
 
