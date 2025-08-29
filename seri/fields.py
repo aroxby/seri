@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 
 # TODO: This should probably default to utf-8 but is set to cp437 to test with StarCraft 2 data
-STRING_CODEC = 'cp437'
+STRING_CODEC = "cp437"
 
 
 DeserializePredicate = Callable[["Serializer", str, "BaseField", dict, bytes, int], bool]
@@ -44,24 +44,26 @@ class ByteArray(BaseField):
         self.length = length
 
     def deserialize(self, data: bytes) -> (bytes, int):
-        return data[:self.length], self.length
+        return data[: self.length], self.length
 
     def serialize(self, obj: bytes) -> bytes:
         # TODO: Throw an error here if we don't have enough data (also in FixedString)
-        return obj[:self.length]
+        return obj[: self.length]
 
 
 class UInt8(BaseField):
     length = 1
 
     def deserialize(self, data: bytes) -> (int, int):
-        return int.from_bytes(data[:self.length], byteorder='little', signed=False), self.length
+        return int.from_bytes(data[: self.length], byteorder="little", signed=False), self.length
 
     def serialize(self, obj) -> bytes:
-        return obj.to_bytes(length=self.length, byteorder='little', signed=False)
+        return obj.to_bytes(length=self.length, byteorder="little", signed=False)
+
 
 class UInt16(UInt8):
     length = 2
+
 
 class UInt32(UInt8):
     length = 4
@@ -73,18 +75,18 @@ class UInt64(UInt8):
 
 class ZString(BaseField):
     def deserialize(self, data: bytes) -> (str, int):
-        mbs, _ = data.split(b'\0', 1)
+        mbs, _ = data.split(b"\0", 1)
         return mbs.decode(STRING_CODEC), len(mbs) + 1
 
     def serialize(self, obj) -> bytes:
-        return obj.encode(STRING_CODEC) + b'\0'
+        return obj.encode(STRING_CODEC) + b"\0"
 
 
 class DynamicString(BaseField):
     length = 0  # Length isn't known until other fields are deserialized
 
     def deserialize(self, data: bytes) -> (str, int):
-        mbs = data[:self.length]
+        mbs = data[: self.length]
         return mbs.decode(STRING_CODEC), len(mbs)
 
     def serialize(self, obj) -> bytes:
@@ -195,4 +197,5 @@ def file_magic_validator(magic: bytes):
     def validator(value: bytes):
         if value != magic:
             raise ValidationError
+
     return validator

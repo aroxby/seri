@@ -14,3 +14,6 @@ requires-python = ">=3.12"
 
 [project.urls]
 Homepage = "https://github.com/your-username/seri"
+
+[tool.black]
+line-length = 120

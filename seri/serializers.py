@@ -9,7 +9,7 @@ class SerializerMeta(type):
         return fields
 
     def __new__(cls, name, bases, attrs, **kwds):
-        attrs['fields'] = cls._get_fields(attrs)
+        attrs["fields"] = cls._get_fields(attrs)
         return super().__new__(cls, name, bases, attrs)
 
 
@@ -29,7 +29,7 @@ class Serializer(metaclass=SerializerMeta):
         return attrs, offset
 
     def serialize(self, attrs: dict) -> bytes:
-        data = b''
+        data = b""
         for name, field in self.fields.items():
             if field.serialize_predicate is None or field.serialize_predicate(self, name, field, attrs, data):
                 data += field.serialize(attrs[name])
