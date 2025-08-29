@@ -33,14 +33,8 @@ class BaseField(ABC):
 
 
 class ByteArray(BaseField):
-    def __init__(
-        self,
-        length: int,
-        validator=None,
-        deserialize_predicate: DeserializePredicate = None,
-        serialize_predicate: SerializePredicate = None,
-    ):
-        super().__init__(validator)
+    def __init__(self, length: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.length = length
 
     def deserialize(self, data: bytes) -> (bytes, int):
@@ -94,14 +88,8 @@ class DynamicString(BaseField):
 
 
 class FixedString(DynamicString):
-    def __init__(
-        self,
-        length: int,
-        validator=None,
-        deserialize_predicate: DeserializePredicate = None,
-        serialize_predicate: SerializePredicate = None,
-    ):
-        super().__init__(validator)
+    def __init__(self, length: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.length = length
 
 
@@ -118,14 +106,8 @@ class ReverseFixedString(FixedString):
 class DynamicList(BaseField):
     length = 0  # Length isn't known until other fields are deserialized
 
-    def __init__(
-        self,
-        element_field: BaseField,
-        validator=None,
-        deserialize_predicate: DeserializePredicate = None,
-        serialize_predicate: SerializePredicate = None,
-    ):
-        super().__init__(validator)
+    def __init__(self, element_field: BaseField, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.element_field = element_field
 
     def deserialize(self, data: bytes) -> (list, int):
@@ -147,15 +129,8 @@ class DynamicList(BaseField):
 
 
 class EncodedLength(BaseField):
-    def __init__(
-        self,
-        length_field: BaseField,
-        element_field: BaseField,
-        validator=None,
-        deserialize_predicate: DeserializePredicate = None,
-        serialize_predicate: SerializePredicate = None,
-    ):
-        super().__init__(validator)
+    def __init__(self, length_field: BaseField, element_field: BaseField, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.length_field = length_field
         self.element_field = element_field
 
@@ -172,14 +147,8 @@ class EncodedLength(BaseField):
 
 
 class NestedSerializer(BaseField):
-    def __init__(
-        self,
-        serializer: "Serializer",
-        validator=None,
-        deserialize_predicate: DeserializePredicate = None,
-        serialize_predicate: SerializePredicate = None,
-    ):
-        super().__init__(validator)
+    def __init__(self, serializer: "Serializer", *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.serializer = serializer
 
     def deserialize(self, data: bytes) -> (dict, int):
