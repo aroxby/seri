@@ -4,7 +4,7 @@ from seri.fields import BaseField
 class SerializerMeta(type):
     @staticmethod
     def _get_fields(attrs: dict) -> dict:
-        # TODO: Sort fields? Then use an OrderedDict for deterministic ordering
+        # Note: Dictionaries preserve insertion order
         fields = {key: value for key, value in attrs.items() if isinstance(value, BaseField)}
         return fields
 
